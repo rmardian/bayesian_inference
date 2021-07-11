@@ -3,6 +3,8 @@ import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
 
+from datetime import datetime
+
 import pymc3 as pm
 from pymc3.ode import DifferentialEquation
 import arviz as az
@@ -89,7 +91,9 @@ errs = {
     'n': 2.512038e+00
 }
 
-with pm.Model() as od_model:
+beginning = datetime.now()
+
+with pm.Model() as bayesian_model:
     
     bn = pm.Normal('bn', mu=pars['bn'], sigma=errs['bn'])
     bc = pm.Normal('bc', mu=pars['bc'], sigma=errs['bc'])
@@ -115,6 +119,11 @@ with pm.Model() as od_model:
     #trace = pm.sample(2000, tune=1000, cores=1, step=step)
     trace = pm.sample(1000, tune=1000, cores=1, step=step)
 
+with bayesian_model:
     data = az.from_pymc3(trace=trace)
-    data.to_netcdf('bayesian.nc')
     data.to_netcdf(gate + '.nc')
+
+ending = datetime.now()
+print('Started at:', beginning)
+print('Finished at:', ending)
+print('Execution time:', ending-beginning)
