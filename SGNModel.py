@@ -55,7 +55,7 @@ fluos = pd.read_csv('marionette_fluo.csv', index_col='time')
 ods = pd.read_csv('marionette_od.csv', index_col='time')
 gates = list(set([i[:-3] for i in fluos.columns.tolist()]))
 
-gate = 'e11x32STPhoRadA'
+gate = 'e42x32STIMPDH1'
 
 fluo_sel = fluos.loc[:, fluos.columns.str.startswith(gate)]
 od_sel = ods.loc[:, ods.columns.str.startswith(gate)]
