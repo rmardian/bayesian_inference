@@ -92,6 +92,7 @@ errs = {
 }
 
 beginning = datetime.now()
+print('Started at:', beginning)
 
 with pm.Model() as bayesian_model:
     
@@ -121,9 +122,8 @@ with pm.Model() as bayesian_model:
 
 with bayesian_model:
     data = az.from_pymc3(trace=trace)
-    data.to_netcdf(gate + '.nc')
+    data.to_netcdf(gate + '-' + datetime.now().strftime('%Y%m%d') + '.nc')
 
 ending = datetime.now()
-print('Started at:', beginning)
 print('Finished at:', ending)
 print('Execution time:', ending-beginning)
