@@ -96,6 +96,7 @@ print('Started at:', beginning)
 
 with pm.Model() as bayesian_model:
     
+    '''
     bn = pm.Normal('bn', mu=pars['bn'], sigma=errs['bn'])
     bc = pm.Normal('bc', mu=pars['bc'], sigma=errs['bc'])
     bg = pm.Normal('bg', mu=pars['bg'], sigma=errs['bg'])
@@ -107,6 +108,18 @@ with pm.Model() as bayesian_model:
     deg_GFP = pm.Normal('deg_GFP', mu=pars['deg_GFP'], sigma=errs['deg_GFP'])
     K = pm.Normal('K', mu=pars['K'], sigma=errs['K'])
     n = pm.Normal('n', mu=pars['n'], sigma=errs['n'])
+    '''
+    bn = pm.Uniform('bn', 0, 1e1)
+    bc = pm.Uniform('bc', 0, 1e1)
+    bg = pm.Uniform('bg', 0, 1e1)
+    syn_ECFn = pm.Uniform('syn_ECFn', 0, 1e2)
+    syn_ECFc = pm.Uniform('syn_ECFc', 0, 1e2)
+    syn_ECF = pm.Uniform('syn_ECF', 0, 1e-4)
+    syn_GFP = pm.Uniform('syn_GFP', 0, 1e-1)
+    deg = pm.Uniform('deg', 0, 1e5)
+    deg_GFP = pm.Uniform('deg_GFP', 0, 1e0)
+    K = pm.Uniform('K', 0, 1e2)
+    n = pm.Uniform('n', 0, 4)
     
     y_hat = DifferentialEquation(
         func=SGNModel.gate_model_no_auto, times=fluo.index, n_states=4, n_theta=11
