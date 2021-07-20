@@ -14,10 +14,10 @@ class ODModel:
     
     @staticmethod
     def od_model(y, t, p):
-        dOD = growth_rate(y[0], p[0], p[1]) * y[0]
+        dOD = ODModel.growth_rate(y[0], p[0], p[1]) * y[0]
         return [dOD]
 
-ods = pd.read_csv('datasets/marionette_od.csv', index_col='time')
+ods = pd.read_csv('marionette_od.csv', index_col='time')
 gates = list(set([i[:-3] for i in ods.columns.tolist()]))
 
 for gate in gates:
@@ -42,10 +42,10 @@ for gate in gates:
         od_est = pm.Normal('od', mu=y_hat.T[0], sd=0.3, observed=od)
 
         step = pm.Metropolis()
-        trace = pm.sample(5000, tune=3000, cores=1, chains=3, step=step)
+        trace = pm.sample(5000, tune=5000, cores=-1, chains=3, step=step)
         
         data = az.from_pymc3(trace=trace)
-        data.to_netcdf(gate + '-' + datetime.now().strftime('%Y%m%d') + '.nc')
+        data.to_netcdf('OD-' + gate + '-' + datetime.now().strftime('%Y%m%d') + '.nc')
     
 ending = datetime.now()
 print('Finished at:', ending)
