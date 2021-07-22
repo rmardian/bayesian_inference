@@ -37,7 +37,7 @@ class SGNModel:
 
         return [dECFn, dECFc, dECF, dGFP, dOD]
 
-fluos = pd.read_csv('datasets/marionette_fluo.csv', index_col='time')
+fluos = pd.read_csv('marionette_fluo.csv', index_col='time')
 gates = [g for g in list(set([i[:-3] for i in fluos.columns.tolist()])) if g not in ['positive_control', 'negative_control', 'blank']]
 fluos_arr = [fluos.loc[:, fluos.columns.str.startswith(gate)].iloc[:,3] for gate in gates]
 
