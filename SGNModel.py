@@ -69,7 +69,7 @@ with pm.Model() as fluo_model:
     ee = [50 for i in range(9)]
     #ff = [f0, f1, f2, f3, f4, f5, f6, f7, f8]
     gg = [0.05 for i in range(9)]
-    #hh = [h0, h1, h2, h3, h4, h5, h6, h7, h8]
+    hh = [1e-7 for i in range(9)]
     i = 0.05
     jj = [20 for i in range(9)]
     kk = [4 for i in range(9)]
@@ -78,7 +78,7 @@ with pm.Model() as fluo_model:
     for idx in range(len(gates)):
         
         ff[idx] = pm.Uniform('syn_ECF_' + gates[idx], 0, 1e2)
-        hh[idx] = pm.Uniform('syn_GFP_' + gates[idx], 0, 1e5)
+        #hh[idx] = pm.Uniform('syn_GFP_' + gates[idx], 0, 1e5)
         
     for idx in range(len(gates)):
         
