@@ -79,10 +79,10 @@ for idx, par in enumerate(paired_pars):
         r, c, c0 = od_params[gate]
 
         y_hat = pm.ode.DifferentialEquation(
-            func=SGNSingleModel.gate_model, times=fluos.index, n_states=5, n_theta=14
+            func=SGNSingleModel.gate_model, times=fluo.index, n_states=5, n_theta=14
         )(y0=[0, 0, 0, 0, c0], theta=[bn, bc, bg, syn_ECFn, syn_ECFc, syn_ECF, deg, syn_GFP, deg_GFP, K, n, r, c, c0])
 
-        fluo = pm.Normal('fluo', mu=y_hat.T[3], sd=0.25, observed=fluo)
+        fluo_est = pm.Normal('fluo', mu=y_hat.T[3], sd=0.25, observed=fluo)
 
         step = pm.Metropolis()
         trace = pm.sample(1000, tune=2000, cores=-1, chains=3, step=step)
