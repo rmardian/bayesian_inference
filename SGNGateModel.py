@@ -71,7 +71,7 @@ with pm.Model() as fluo_model:
         
     y_hat = pm.ode.DifferentialEquation(
         func=SGNGateModel.gate_model, times=fluos.index, n_states=5, n_theta=14
-    )(y0=[0, 0, 0, 0, c0], theta=[bn, bc, bg, syn_ECFn, syn_ECFc, syn_ECF, deg, syn_GFP, deg_GFP, K, n, r, c, c0])
+    )(y0=[0, 0, 0, 0, c0], theta=[bn, bc, bg, syn_ECFn, syn_ECFc, syn_ECF, deg, syn_GFP, deg_GFP, K, n, r, cc, c0])
     
     fluo_est = pm.Normal('fluo', mu=y_hat.T[3], sd=0.25, observed=fluo)
     
