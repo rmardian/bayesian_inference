@@ -19,7 +19,7 @@ od = od_sel.iloc[:,3]
 
 model = """
     functions {
-        real[] logisticgrowth(real t,
+        real[] growth(real t,
                       real[] y,
                       real[] theta,
                       real[] x_r,
@@ -51,13 +51,12 @@ model = """
     }
     model {
         real y_hat[T, n_wells];
-        theta ~ cauchy(0,2.5);
-        sigma ~ normal(0,0.01);
-        y_hat = integrate_ode_rk45(logisticgrowth, y0, t0, ts, theta, x_r, x_i);
+        theta[0] ~ cauchy(0,2.5);
+        theta[1] ~ cauchy(0,2.5);
+        sigma ~ normal(0, 0.01);
+        y_hat = integrate_ode_rk45(growth, y0, t0, ts, theta, x_r, x_i);
         for (t in 1:T) {
-            for (i in 1:n_wells) {
-                z[t,i] ~ normal(y_hat[t,i], sigma);
-            }
+            z[t,1] ~ normal(y_hat[t,1], sigma);
         }
     }
 """
