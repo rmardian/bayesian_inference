@@ -35,8 +35,8 @@ model = """
             growth = (a * (1 - (y/b)));
             return growth;
         }
-        real[] growth(real t, real[] y, real[] theta, real[] x_r, int[] x_i) {
-            real dydt[5];
+        real[] gate_model(real t, real[] y, real[] theta, real[] x_r, int[] x_i) {
+            #real dydt[5];
             real OD = y[1];
             real ECFn = y[2];
             real ECFc = y[3];
@@ -58,12 +58,12 @@ model = """
             int ind1 = x_i[1];
             int ind2 = x_i[2];
             real gamma = growth_rate(OD, alpha, beta);
-            real dydt[1] = gamma * OD;
-            real dydt[2] = bn + syn_ECFn * ind1 - (deg + gamma) * ECFn;
-            real dydt[3] = bc + syn_ECFc * ind2 - (deg + gamma) * ECFc;
-            real dydt[4] = syn_ECF * ECFn * ECFc - (deg + gamma) * ECF;
-            real dydt[5] = bg + syn_GFP * hill_activation(ECF, K, n) - (deg_GFP + gamma) * GFP;
-            return dydt;
+            real dOD = gamma * OD;
+            real dECFn = bn + syn_ECFn * ind1 - (deg + gamma) * ECFn;
+            real dECFc = bc + syn_ECFc * ind2 - (deg + gamma) * ECFc;
+            real dECF = syn_ECF * ECFn * ECFc - (deg + gamma) * ECF;
+            real dGFP = bg + syn_GFP * hill_activation(ECF, K, n) - (deg_GFP + gamma) * GFP;
+            return { dOD, dECFn, dECFc, dECF, dGFP };
         }
     }
     data {
@@ -102,7 +102,7 @@ model = """
         theta[10] ~ uniform(0, 1e2);
         theta[11] ~ uniform(0, 4);
         sigma ~ normal(0, 0.1);
-        y_hat = integrate_ode_rk45(growth, y0, t0, ts, theta, x_r, x_i);
+        y_hat = integrate_ode_rk45(gate_model, y0, t0, ts, theta, x_r, x_i);
         y[,1] ~ normal(y_hat[,5], sigma);
     }
 """
