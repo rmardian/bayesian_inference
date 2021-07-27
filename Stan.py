@@ -8,9 +8,10 @@ ods = pd.read_csv('marionette_od.csv', index_col='time')
 all_gates = list(set([i[:-3] for i in fluos.columns.tolist()]))
 gates = [g for g in all_gates if g not in ['blank', 'positive_control', 'negative_control']]
 
-sel = 0
-gate = gates[sel]
-print(sel, gate)
+#sel = 0
+#gate = gates[sel]
+gate = "e20x32gp411"
+print(gate)
 fluo_sel = fluos.loc[:, fluos.columns.str.startswith(gate)]
 od_sel = ods.loc[:, fluos.columns.str.startswith(gate)]
 fluo = fluo_sel.iloc[:,3]
@@ -74,7 +75,7 @@ data = {
 sm = pystan.StanModel(model_code=model)
 
 # Train the model and generate samples
-fit = sm.sampling(data=data, iter=100, chains=2, n_jobs=1, verbose=True)
+fit = sm.sampling(data=data, iter=1000, chains=2, n_jobs=-1, verbose=True)
 print(fit)
 
 with open('Stan-' + gate + '.pkl', 'wb') as f:
