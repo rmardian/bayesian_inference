@@ -18,45 +18,54 @@ od = od_sel.iloc[:,3]
 
 model = """
     functions {
-        real[] growth(real t, real[] y, real[] theta, real[] x_r, int[] x_i) {
-            real dydt[1];
-            dydt[1] = theta[1] * y[1] * (1-y[1]/theta[2]);
+        real[] logisticgrowth(real t,
+                      real[] y,
+                      real[] theta,
+                      real[] x_r,
+                      int[] x_i
+                      ) {
+            real dydt[x_i[1]];
+            for (i in 1:x_i[1]){
+                dydt[i] = theta[1] * y[i] * (1-y[i]/theta[2]);
+            }
             return dydt;
         }
     }
     data {
         int<lower=1> T;
-        int<lower=1> n_states;
-        //real y0[n_states];
-        real y[T, n_states];
+        int<lower=1> n_wells;
+        real y0[n_wells];
+        real z[T, n_wells];
         real t0;
         real ts[T];
     }
     transformed data {
         real x_r[0];
-        int x_i[0];
+        int x_i[1];
+        x_i[1] = n_wells;
     }
     parameters {
         real<lower=0> theta[2];
-        real<lower=0> y0[1];
         real<lower=0> sigma;
     }
     model {
-        real y_hat[T, n_states];
-        theta[1] ~ uniform(0, 1);
-        theta[2] ~ uniform(0, 2);
-        y0[1] ~ uniform(0, 0.1);
-        sigma ~ normal(0, 0.2);
-        y_hat = integrate_ode_rk45(growth, y0, t0, ts, theta, x_r, x_i);
-        y[,1] ~ normal(y_hat[,1], sigma);
+        real y_hat[T, n_wells];
+        theta ~ cauchy(0,2.5);
+        sigma ~ normal(0,0.01);
+        y_hat = integrate_ode_rk45(logisticgrowth, y0, t0, ts, theta, x_r, x_i);
+        for (t in 1:T) {
+            for (i in 1:n_wells) {
+                z[t,i] ~ normal(y_hat[t,i], sigma);
+            }
+        }
     }
 """
 
 data = {
     'T': len(od),
-    'n_states': 1,
-    #'y0': [0.02],
-    'y': od.values.reshape(-1, 1),
+    'n_wells': 1,
+    'y0': [0.02],
+    'z': od.values.reshape(-1, 1),
     't0': -20,
     'ts': od.index
 }
@@ -65,7 +74,7 @@ data = {
 sm = pystan.StanModel(model_code=model)
 
 # Train the model and generate samples
-fit = sm.sampling(data=data, iter=1000, chains=2, n_jobs=-1, verbose=True)
+fit = sm.sampling(data=data, iter=100, chains=2, n_jobs=1, verbose=True)
 print(fit)
 
 with open('Stan-' + gate + '.pkl', 'wb') as f:
