@@ -36,7 +36,7 @@ model = """
             return growth;
         }
         real[] gate_model(real t, real[] y, real[] theta, real[] x_r, int[] x_i) {
-            #real dydt[5];
+            
             real OD = y[1];
             real ECFn = y[2];
             real ECFc = y[3];
