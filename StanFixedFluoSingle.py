@@ -134,7 +134,7 @@ print('Started at:', beginning)
 # Compile the model
 sm = pystan.StanModel(model_code=model)
 # Train the model and generate samples
-fit = sm.sampling(data=data, iter=5000, warmup=2500, thin=2, chains=2, n_jobs=-1, control=dict(adapt_delta=0.9), v$
+fit = sm.sampling(data=data, iter=5000, warmup=2500, thin=2, chains=2, n_jobs=-1, control=dict(adapt_delta=0.9), verbose=True)
 print(fit)
 #with open('Stan-Fluo-' + gate + '.pkl', 'wb') as f:
 #    pickle.dump({'model': sm, 'fit': fit}, f)
