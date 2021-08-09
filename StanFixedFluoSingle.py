@@ -3,7 +3,7 @@ import pandas as pd
 import pystan
 import arviz as az
 from datetime import datetime
-fluos = pd.read_csv('marionette_fluo.csv', index_col='time')
+fluos = pd.read_csv('induction_fluo.csv', index_col='time')
 all_gates = list(set([i[:-3] for i in fluos.columns.tolist()]))
 gates = [g for g in all_gates if g not in ['blank', 'positive_control', 'negative_control']]
 gate = "e42x32STIMPDH1"
