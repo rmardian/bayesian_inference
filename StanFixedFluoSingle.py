@@ -47,25 +47,24 @@ model = """
             return growth;
         }
         real[] gate_model(real t, real[] y, real[] theta, real[] x_r, int[] x_i) {
-            
             real OD = y[1];
             real ECFn = y[2];
             real ECFc = y[3];
             real ECF = y[4];
             real GFP = y[5];
-            real bn = theta[1];
-            real bc = theta[2];
-            real bg = theta[3];
-            real syn_ECFn = theta[4];
-            real syn_ECFc = theta[5];
-            real syn_ECF = theta[6];
-            real deg = theta[7];
-            real syn_GFP = theta[8];
-            real deg_GFP = theta[9];
-            real K = theta[10];
-            real n = theta[11];
+            real syn_ECF = theta[1];
+            real syn_GFP = theta[2];
             real alpha = x_r[1];
             real beta = x_r[2];
+            real bn = x_r[3];
+            real bc = x_r[4];
+            real bg = x_r[5];
+            real syn_ECFn = x_r[6];
+            real syn_ECFc = x_r[7];
+            real deg = x_r[8];
+            real deg_GFP = x_r[9];
+            real K = x_r[10];
+            real n = x_r[11];
             int ind1 = x_i[1];
             int ind2 = x_i[2];
             real gamma = growth_rate(OD, alpha, beta);
@@ -85,33 +84,34 @@ model = """
         real t0;
         real ts[T];
         real od_params[2];
+        real fixed_params[9];
         int inducers[2];
     }
+
     transformed data {
-        real x_r[2];
+        real x_r[11];
         int x_i[2];
         x_r[1] = od_params[1];
         x_r[2] = od_params[2];
+        x_r[3] = fixed_params[1];
+        x_r[4] = fixed_params[2];
+        x_r[5] = fixed_params[3];
+        x_r[6] = fixed_params[4];
+        x_r[7] = fixed_params[5];
+        x_r[8] = fixed_params[6];
+        x_r[9] = fixed_params[7];
+        x_r[10] = fixed_params[8];
+        x_r[11] = fixed_params[9];
         x_i[1] = inducers[1];
         x_i[2] = inducers[2];
     }
     parameters {
-        real<lower=0> theta[11];
-        real<lower=0> sigma;
-    }
+        real<lower=0> theta[2];
+        real<lower=0> sigma;}
     model {
         real y_hat[T, num_states];
         theta[1] ~ uniform(0, 1e1);
-        theta[2] ~ uniform(0, 1e1);
-        theta[3] ~ uniform(0, 1e1);
-        theta[4] ~ uniform(0, 1e2);
-        theta[5] ~ uniform(0, 1e2);
-        theta[6] ~ uniform(0, 1e-4);
-        theta[7] ~ uniform(0, 1e-1);
-        theta[8] ~ uniform(0, 1e0);
-        theta[9] ~ uniform(0, 1e5);
-        theta[10] ~ uniform(0, 1e2);
-        theta[11] ~ uniform(0, 4);
+        theta[2] ~ uniform(0, 1e5);
         sigma ~ normal(0, 0.1);
         y_hat = integrate_ode_rk45(gate_model, y0, t0, ts, theta, x_r, x_i);
         y[,1] ~ normal(y_hat[,5], sigma);
@@ -126,29 +126,26 @@ data = {
     't0': -20,
     'ts': fluo.index,
     'od_params': [od_params[gate][0], od_params[gate][1]],
+    'fixed_params': [2, 2, 2, 50, 50, 0.05, 0.05, 2, 4],
     'inducers': [1, 1]
 }
-
 beginning = datetime.now()
 print('Started at:', beginning)
-
 # Compile the model
 sm = pystan.StanModel(model_code=model)
 # Train the model and generate samples
-fit = sm.sampling(data=data, iter=7000, warmup=2000, thin=2, chains=2, n_jobs=-1, control=dict(adapt_delta=0.9), verbose=True)
+fit = sm.sampling(data=data, iter=5000, warmup=2500, thin=2, chains=2, n_jobs=-1, control=dict(adapt_delta=0.9), v$
 print(fit)
 #with open('Stan-Fluo-' + gate + '.pkl', 'wb') as f:
 #    pickle.dump({'model': sm, 'fit': fit}, f)
-
 summary_dict = fit.summary()
 df = pd.DataFrame(summary_dict['summary'], 
                 columns=summary_dict['summary_colnames'], 
                 index=summary_dict['summary_rownames'])
-df.to_csv('Fluo-' + gate +  '.csv')
-#with open('Stan-' + gate + '-az.pkl', 'wb') as f:
-#    pickle.dump({'model': sm, 'fit': fit}, f)
+                df.to_csv('Fluo-' + gate +  '.csv')
+
 data = az.from_pystan(posterior=fit)
 data.to_netcdf('Fluo-' + gate + '.nc')
-
 ending = datetime.now()
 print('Finished at:', ending)
+print('Execution time:', ending-beginning)
