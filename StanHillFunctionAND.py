@@ -96,7 +96,7 @@ summary_dict = fit.summary()
 df = pd.DataFrame(summary_dict['summary'], 
                 columns=summary_dict['summary_colnames'], 
                 index=summary_dict['summary_rownames'])
-                df.to_csv('Hill-' + gate +  '.csv')
+df.to_csv('Hill-' + gate +  '.csv')
 
 data = az.from_pystan(posterior=fit)
 data.to_netcdf('Hill-' + gate + '.nc')
