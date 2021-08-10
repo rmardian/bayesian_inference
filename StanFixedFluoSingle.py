@@ -3,12 +3,15 @@ import pandas as pd
 import pystan
 import arviz as az
 from datetime import datetime
-fluos = pd.read_csv('induction_fluo.csv', index_col='time')
+
+fluos = pd.read_csv('marionette_fluo.csv', index_col='time')
 all_gates = list(set([i[:-3] for i in fluos.columns.tolist()]))
 gates = [g for g in all_gates if g not in ['blank', 'positive_control', 'negative_control']]
+
 gate = "e42x32STIMPDH1"
 print(gate)
 fluo = fluos.loc[:, fluos.columns.str.startswith(gate)].iloc[:,3]
+
 #from PyMC3
 #od_params = {
 #    'e38x32gp418': [0.014832545686692651, 1.206999008636522, 0.05586756964448041],
@@ -21,6 +24,7 @@ fluo = fluos.loc[:, fluos.columns.str.startswith(gate)].iloc[:,3]
 #    'e41x32NrdJ1': [0.013145465488589058, 1.2385872370025641, 0.05941283831303974],
 #    'e42x32STIMPDH1': [0.012125122999895207, 1.2815026045141547, 0.0524312129470823],
 #}
+
 #from PyStan
 od_params = {
     'e16x33NrdA2': [0.0148194554039306, 1.2408917618889663, 0.0251889022569271],
@@ -87,7 +91,6 @@ model = """
         real fixed_params[9];
         int inducers[2];
     }
-
     transformed data {
         real x_r[11];
         int x_i[2];
@@ -107,7 +110,8 @@ model = """
     }
     parameters {
         real<lower=0> theta[2];
-        real<lower=0> sigma;}
+        real<lower=0> sigma;
+    }
     model {
         real y_hat[T, num_states];
         theta[1] ~ uniform(0, 1e1);
@@ -126,11 +130,13 @@ data = {
     't0': -20,
     'ts': fluo.index,
     'od_params': [od_params[gate][0], od_params[gate][1]],
-    'fixed_params': [2, 2, 2, 50, 50, 0.05, 0.05, 2, 4],
+    'fixed_params': [1.11e0, 4.72e0, 3.56e0, 30.76e0, 41.55e0, 1.30e-2, 5.24e-1, 71.91e0, 3.94],
     'inducers': [1, 1]
 }
+
 beginning = datetime.now()
 print('Started at:', beginning)
+
 # Compile the model
 sm = pystan.StanModel(model_code=model)
 # Train the model and generate samples
@@ -138,14 +144,17 @@ fit = sm.sampling(data=data, iter=5000, warmup=2500, thin=2, chains=2, n_jobs=-1
 print(fit)
 #with open('Stan-Fluo-' + gate + '.pkl', 'wb') as f:
 #    pickle.dump({'model': sm, 'fit': fit}, f)
+
 summary_dict = fit.summary()
 df = pd.DataFrame(summary_dict['summary'], 
                 columns=summary_dict['summary_colnames'], 
                 index=summary_dict['summary_rownames'])
 df.to_csv('Fluo-' + gate +  '.csv')
-
+#with open('Stan-' + gate + '-az.pkl', 'wb') as f:
+#    pickle.dump({'model': sm, 'fit': fit}, f)
 data = az.from_pystan(posterior=fit)
 data.to_netcdf('Fluo-' + gate + '.nc')
+
 ending = datetime.now()
 print('Finished at:', ending)
 print('Execution time:', ending-beginning)
