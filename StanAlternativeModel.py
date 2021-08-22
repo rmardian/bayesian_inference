@@ -78,7 +78,7 @@ model = """
         real x_r[2];
         int x_i[0];
         x_r[1] = degGFP;
-        x_r[2] = hill_activation_and(x1, x2, params, T)
+        x_r[2] = hill_activation_and(x1, x2, params, T);
     }
     parameters {
         real<lower=0> sigma;
