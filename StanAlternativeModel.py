@@ -54,19 +54,11 @@ model = """
         real degGFP;
     }
     transformed data {
-        real x_r[11];
+        real x_r[3];
         int x_i[0];
         x_r[1] = x1;
         x_r[2] = x2;
         x_r[3] = degGFP;
-        x_r[4] = params[1];
-        x_r[5] = params[2];
-        x_r[6] = params[3];
-        x_r[7] = params[4];
-        x_r[8] = params[5];
-        x_r[9] = params[6];
-        x_r[10] = params[7];
-        x_r[11] = params[8];
     }
     parameters {
         real<lower=0> sigma;
