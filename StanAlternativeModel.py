@@ -36,7 +36,7 @@ model = """
                     ) {
             real dydt[2];
             real ymax;
-            ymax = hill_activation_and(x_r[1], x_r[2], 10.41225458, 5.87647366, 4.30770405, 1.01184319, 19.08872036, 15.87715881, 232.88219568, 232.90886374);
+            ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
             dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
@@ -91,7 +91,7 @@ gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
 a = 5
 b = 5
-gate = 'e42x32STIMPDH1'
+gate = 'e38x32gp418'
 fluo = fluos['{}_{}{}'.format(gate, a, b)]
 
 cuma_list = [0, 6.25, 12.5, 25, 50, 100]
