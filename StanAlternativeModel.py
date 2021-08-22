@@ -82,7 +82,7 @@ model = """
     }
     parameters {
         real<lower=0> sigma;
-        real<lower=0> theta[3];
+        real<lower=0> theta[2];
         real<lower=0.01> y0;
     }
     model {
@@ -91,7 +91,7 @@ model = """
         theta[1] ~ uniform(0, 1);
         theta[2] ~ uniform(0, 2);
         sigma ~ normal(0, 0.1);
-        y0 ~ uniform(0, 1);
+        y0 ~ uniform(1e-2, 1e4);
         y0_[1] = y0;
         y0_[2] = 0;
         y_hat = integrate_ode_rk45(alternative_dynamics, y0_, t0, ts, theta, x_r, x_i);
@@ -99,12 +99,9 @@ model = """
     }
 """
 
-degGFP = 0.02 #fixed deg param
-
 fluos = pd.read_csv('induction_fluo.csv', index_col='time')
 gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32x30SspGyrB',
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
-
 a = 5
 b = 5
 gate = 'e42x32STIMPDH1'
