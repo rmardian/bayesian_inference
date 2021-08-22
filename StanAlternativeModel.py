@@ -39,7 +39,7 @@ model = """
             //ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
             ymax = 63049.65321621873;
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
-            dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
+            dydt[2] = theta[2] * y[1] - 0.02 * y[2];
             return dydt;
         }
     }
@@ -54,11 +54,8 @@ model = """
         real degGFP;
     }
     transformed data {
-        real x_r[3];
+        real x_r[0];
         int x_i[0];
-        x_r[1] = x1;
-        x_r[2] = x2;
-        x_r[3] = degGFP;
     }
     parameters {
         real<lower=0> sigma;
