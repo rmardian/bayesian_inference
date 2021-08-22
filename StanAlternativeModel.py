@@ -111,11 +111,9 @@ cuma_list = [0, 6.25, 12.5, 25, 50, 100]
 ara_list = [0, 0.8125, 3.25, 13, 52, 208]
 cuma = cuma_list[a]
 ara = ara_list[b]
-t = len(cuma_list) * len(ara_list)
-x1, x2 = np.meshgrid(cuma_list, ara_list)
 
 data = {
-    'T': t,
+    'T': len(fluo),
     'num_params': 3,
     'num_states': 2,
     'x1': cuma,
