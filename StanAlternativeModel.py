@@ -55,14 +55,12 @@ model = """
     }
     data {
         int<lower=1> T;
-        int<lower=1> num_params;
-        int<lower=1> num_states;
         real x1;
         real x2;
         real y[T, 1];
         real t0;
         real ts[T];
-        real params[num_params];
+        real params[8];
         real degGFP;
     }
     transformed data {
@@ -87,7 +85,7 @@ model = """
     }
     model {
         real y_hat[T, 1];
-        real y0_[num_states];
+        real y0_[2];
         theta[1] ~ uniform(0, 1);
         theta[2] ~ uniform(0, 2);
         sigma ~ normal(0, 0.1);
@@ -114,8 +112,6 @@ ara = ara_list[b]
 
 data = {
     'T': len(fluo),
-    'num_params': 3,
-    'num_states': 2,
     'x1': cuma,
     'x2': ara,
     'y': fluo.values.reshape(-1, 1),
