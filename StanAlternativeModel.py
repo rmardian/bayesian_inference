@@ -39,7 +39,7 @@ model = """
             hill = hill_activation(x1, K1, n1, ymin1, ymax1) + hill_activation(x2, K2, n2, ymin2, ymax2);
             return hill;
         }
-        real[] alternative_dynamic(real t,
+        real[] alternative_dynamics(real t,
                     real[] y,
                     real[] theta,
                     real[] x_r,
