@@ -36,7 +36,8 @@ model = """
                     ) {
             real dydt[2];
             real ymax;
-            ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
+            //ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
+            ymax = 63049.65321621873;
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
             dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
@@ -89,9 +90,9 @@ model = """
 fluos = pd.read_csv('induction_fluo.csv', index_col='time')
 gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32x30SspGyrB',
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
-a = 5
-b = 5
-gate = 'e38x32gp418'
+a = 3
+b = 4
+gate = 'e41x32NrdJ1'
 fluo = fluos['{}_{}{}'.format(gate, a, b)]
 
 cuma_list = [0, 6.25, 12.5, 25, 50, 100]
