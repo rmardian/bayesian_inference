@@ -47,7 +47,7 @@ model = """
                     ) {
             real dydt[2];
             real ymax;
-            ymax = hill_activation_and(x_r[1], x_r[2], x_r[3], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
+            ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
             dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
