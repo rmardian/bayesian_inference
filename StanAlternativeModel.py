@@ -35,7 +35,6 @@ model = """
             return hill;
         }
         real[] hill_activation_and(real[] x1, real[] x2, real[] theta, int T) {
-            
             real K1 = theta[1];
             real K2 = theta[2];
             real n1 = theta[3];
@@ -57,8 +56,10 @@ model = """
                     int[] x_i
                     ) {
             real dydt[2];
-            dydt[1] = theta[1] * y[1] * (1-y[1]/theta[2]);
-            dydt[2] = theta[3] * y[1] - x_r[1] * y[2];
+            real ymax;
+            ymax = hill_activation_and(x_r[1], x_r[2], x_r[3], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11], x_i[1]);
+            dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
+            dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
         }
     }
@@ -66,8 +67,8 @@ model = """
         int<lower=1> T;
         int<lower=1> num_params;
         int<lower=1> num_states;
-        real x1[T];
-        real x2[T];
+        real x1;
+        real x2;
         real y[T, 1];
         real t0;
         real ts[T];
@@ -75,10 +76,19 @@ model = """
         real degGFP;
     }
     transformed data {
-        real x_r[2];
-        int x_i[0];
-        x_r[1] = degGFP;
-        x_r[2] = hill_activation_and(x1, x2, params, T);
+        real x_r[11];
+        int x_i[1];
+        x_r[1] = x1;
+        x_r[2] = x2;
+        x_r[3] = degGFP;
+        x_r[4] = params[1];
+        x_r[5] = params[2];
+        x_r[6] = params[3];
+        x_r[7] = params[4];
+        x_r[8] = params[5];
+        x_r[9] = params[6];
+        x_r[10] = params[7];
+        x_r[11] = params[8];
     }
     parameters {
         real<lower=0> sigma;
@@ -86,12 +96,10 @@ model = """
         real<lower=0.01> y0;
     }
     model {
-
         real y_hat[T, 1];
         real y0_[num_states];
         theta[1] ~ uniform(0, 1);
         theta[2] ~ uniform(0, 2);
-        theta[3] ~ uniform(0, 2);
         sigma ~ normal(0, 0.1);
         y0 ~ uniform(0, 1);
         y0_[1] = y0;
@@ -123,8 +131,8 @@ data = {
     'T': t,
     'num_params': 3,
     'num_states': 2,
-    'x1': x1.ravel(),
-    'x2': x2.ravel(),
+    'x1': cuma,
+    'x2': ara,
     'y': fluo.values.reshape(-1, 1),
     't0': -20,
     'ts': fluo.index,
