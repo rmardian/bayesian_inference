@@ -34,19 +34,9 @@ model = """
             hill = ymin + (ymax - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
             return hill;
         }
-        real[] hill_activation_and(real[] x1, real[] x2, real[] theta, int T) {
-            real K1 = theta[1];
-            real K2 = theta[2];
-            real n1 = theta[3];
-            real n2 = theta[4];
-            real ymin1 = theta[5];
-            real ymin2 = theta[6];
-            real ymax1 = theta[7];
-            real ymax2 = theta[8];
-            real hill[T];
-            for (t in 1:T) {
-                hill[t] = hill_activation(x1[t], K1, n1, ymin1, ymax1) + hill_activation(x2[t], K2, n2, ymin2, ymax2);
-            }
+        real hill_activation_and(real x1, real x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, real ymax1, real ymax2) {
+            real hill;
+            hill = hill_activation(x1, K1, n1, ymin1, ymax1) + hill_activation(x2, K2, n2, ymin2, ymax2);
             return hill;
         }
         real[] alternative_dynamic(real t,
@@ -57,7 +47,7 @@ model = """
                     ) {
             real dydt[2];
             real ymax;
-            ymax = hill_activation_and(x_r[1], x_r[2], x_r[3], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11], x_i[1]);
+            ymax = hill_activation_and(x_r[1], x_r[2], x_r[3], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
             dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
@@ -77,7 +67,7 @@ model = """
     }
     transformed data {
         real x_r[11];
-        int x_i[1];
+        int x_i[0];
         x_r[1] = x1;
         x_r[2] = x2;
         x_r[3] = degGFP;
