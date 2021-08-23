@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import pystan
+import stan
 import arviz as az
 from datetime import datetime
 
@@ -91,20 +91,13 @@ data = {
 beginning = datetime.now()
 print('Started at:', beginning)
 # Compile the model
-sm = pystan.StanModel(model_code=model)
-# Train the model and generate samples
-fit = sm.sampling(data=data, iter=5000, warmup=2500, thin=2, chains=2, n_jobs=-1, control=dict(adapt_delta=0.9), verbose=True)
+posterior = stan.build(model, data=data)
+fit = posterior.sample(num_chains=10, num_warmup=5000, num_samples=10000)
+df = fit.to_frame()
+df.to_csv('PyStan3-Hill-' + gate +  '.csv')
 print(fit)
-#with open('Stan-Fluo-' + gate + '.pkl', 'wb') as f:
-#    pickle.dump({'model': sm, 'fit': fit}, f)
-summary_dict = fit.summary()
-df = pd.DataFrame(summary_dict['summary'], 
-                columns=summary_dict['summary_colnames'], 
-                index=summary_dict['summary_rownames'])
-df.to_csv('Hill-' + gate +  '.csv')
-
 data = az.from_pystan(posterior=fit)
-data.to_netcdf('Hill-' + gate + '.nc')
+data.to_netcdf('PyStan3-Hill-' + gate + '.nc')
 ending = datetime.now()
 print('Finished at:', ending)
 print('Execution time:', ending-beginning)

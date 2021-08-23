@@ -36,10 +36,10 @@ model = """
                     ) {
             real dydt[2];
             real ymax;
-            //ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
-            ymax = 63049.65321621873;
+            ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
+            //ymax = 63049.65321621873;
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
-            dydt[2] = theta[2] * y[1] - 0.02 * y[2];
+            dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
         }
     }
@@ -54,25 +54,36 @@ model = """
         real degGFP;
     }
     transformed data {
-        real x_r[0];
+        real x_r[11];
         int x_i[0];
+        x_r[1] = x1;
+        x_r[2] = x2;
+        x_r[3] = degGFP;
+        x_r[4] = params[1];
+        x_r[5] = params[2];
+        x_r[6] = params[3];
+        x_r[7] = params[4];
+        x_r[8] = params[5];
+        x_r[9] = params[6];
+        x_r[10] = params[7];
+        x_r[11] = params[8];
     }
     parameters {
-        real<lower=0> sigma;
+        //real<lower=0> sigma;
         real<lower=0> theta[2];
         real<lower=0.01> y0;
     }
     model {
         real y_hat[T, 1];
         real y0_[2];
-        theta[1] ~ uniform(0, 1);
-        theta[2] ~ uniform(0, 2);
-        sigma ~ normal(0, 0.1);
+        theta[1] ~ uniform(0, 0.2);
+        theta[2] ~ uniform(0, 10);
+        //sigma ~ normal(0, 0.1);
         y0 ~ uniform(1e-2, 1e4);
         y0_[1] = y0;
         y0_[2] = 0;
         y_hat = integrate_ode_rk45(alternative_dynamics, y0_, t0, ts, theta, x_r, x_i);
-        y[,1] ~ normal(y_hat[,1], sigma);
+        y[,1] ~ normal(y_hat[,1], 218.7);
     }
 """
 
@@ -95,7 +106,7 @@ data = {
     'x2': ara,
     'y': fluo.values.reshape(-1, 1),
     't0': -20,
-    'ts': fluo.index,
+    'ts': fluo.index.values,
     'params': hill_params[gate],
     'degGFP': 0.02
 }
@@ -104,9 +115,9 @@ beginning = datetime.now()
 print('Started at:', beginning)
 # Compile the model
 posterior = stan.build(model, data=data)
-fit = posterior.sample(num_chains=2, num_samples=1000)
-#df = fit.to_frame()
-#df.to_csv('TrialPyStan3-' + gate +  '.csv')
+fit = posterior.sample(num_chains=10, num_samples=10000)
+df = fit.to_frame()
+df.to_csv('PyStan3-Alternative-' + gate +  '.csv')
 print(fit)
 #summary_dict = fit.summary()
 #df = pd.DataFrame(summary_dict['summary'],
@@ -115,7 +126,7 @@ print(fit)
 #df.to_csv('Fluo-' + gate +  '.csv')
 #with open('Stan-' + gate + '-az.pkl', 'wb') as f:
 #    pickle.dump({'model': sm, 'fit': fit}, f)
-#data = az.from_pystan(posterior=fit)
-#data.to_netcdf('Fluo-' + gate + '.nc')
+data = az.from_pystan(posterior=fit)
+data.to_netcdf('PyStan3-Alternative-' + gate + '.nc')
 ending = datetime.now()
 print('Finished at:', ending)
