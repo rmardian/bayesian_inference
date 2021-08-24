@@ -37,7 +37,6 @@ model = """
             real dydt[2];
             real ymax;
             ymax = hill_activation_and(x_r[1], x_r[2], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10], x_r[11]);
-            //ymax = 63049.65321621873;
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
             dydt[2] = theta[2] * y[1] - x_r[3] * y[2];
             return dydt;
@@ -69,64 +68,61 @@ model = """
         x_r[11] = params[8];
     }
     parameters {
-        //real<lower=0> sigma;
+        real<lower=0> sigma;
         real<lower=0> theta[2];
         real<lower=0.01> y0;
     }
     model {
         real y_hat[T, 1];
         real y0_[2];
-        theta[1] ~ uniform(0, 0.2);
-        theta[2] ~ uniform(0, 10);
-        //sigma ~ normal(0, 0.1);
-        y0 ~ uniform(1e-2, 1e4);
+        theta[1] ~ normal(1, 0.2);
+        theta[2] ~ normal(10, 5);
+        sigma ~ normal(0, 1);
+        y0 ~ normal(1e3, 5e2);
         y0_[1] = y0;
         y0_[2] = 0;
         y_hat = integrate_ode_rk45(alternative_dynamics, y0_, t0, ts, theta, x_r, x_i);
-        y[,1] ~ normal(y_hat[,1], 218.7);
+        y[,1] ~ normal(y_hat[,2], sigma);
     }
 """
 
 fluos = pd.read_csv('induction_fluo.csv', index_col='time')
 gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32x30SspGyrB',
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
-a = 3
-b = 4
-gate = 'e41x32NrdJ1'
-fluo = fluos['{}_{}{}'.format(gate, a, b)]
-
 cuma_list = [0, 6.25, 12.5, 25, 50, 100]
 ara_list = [0, 0.8125, 3.25, 13, 52, 208]
-cuma = cuma_list[a]
-ara = ara_list[b]
-
-data = {
-    'T': len(fluo),
-    'x1': cuma,
-    'x2': ara,
-    'y': fluo.values.reshape(-1, 1),
-    't0': -20,
-    'ts': fluo.index.values,
-    'params': hill_params[gate],
-    'degGFP': 0.02
-}
 
 beginning = datetime.now()
-print('Started at:', beginning)
-# Compile the model
-posterior = stan.build(model, data=data)
-fit = posterior.sample(num_chains=10, num_samples=10000)
-df = fit.to_frame()
-df.to_csv('PyStan3-Alternative-' + gate +  '.csv')
-print(fit)
-#summary_dict = fit.summary()
-#df = pd.DataFrame(summary_dict['summary'],
-#                columns=summary_dict['summary_colnames'],
-#                index=summary_dict['summary_rownames'])
-#df.to_csv('Fluo-' + gate +  '.csv')
-#with open('Stan-' + gate + '-az.pkl', 'wb') as f:
-#    pickle.dump({'model': sm, 'fit': fit}, f)
-data = az.from_pystan(posterior=fit)
-data.to_netcdf('PyStan3-Alternative-' + gate + '.nc')
+
+for gate in gates:
+    for a in range(5, 6):
+        #for b in range(6):
+
+        print('******************{}_{}{}'.format(gate, a, a))
+        fluo = fluos['{}_{}{}'.format(gate, a, a)]
+        cuma = cuma_list[a]
+        ara = ara_list[a]
+
+        data = {
+            'T': len(fluo),
+            'x1': cuma,
+            'x2': ara,
+            'y': fluo.values.reshape(-1, 1),
+            't0': -20,
+            'ts': fluo.index.values,
+            'params': hill_params[gate],
+            'degGFP': 0.01
+        }
+
+        # Compile the model
+        posterior = stan.build(model, data=data)
+        fit = posterior.sample(num_chains=10, num_warmup=5000, num_samples=10000)
+        df = fit.to_frame()
+        df.to_csv('alternative-model-complete/P3-Alternative-{}-{}{}.csv'.format(gate, a, a))
+        data = az.from_pystan(posterior=fit)
+        data.to_netcdf('alternative-model-complete/P3-Alternative-{}-{}{}.nc'.format(gate, a, a))
+
 ending = datetime.now()
+print('Started at:', beginning)
 print('Finished at:', ending)
+print('Execution time:', ending-beginning)
