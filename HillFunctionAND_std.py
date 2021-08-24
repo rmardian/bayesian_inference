@@ -11,7 +11,7 @@ model = """
             hill = ymin + (ymax - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
             return hill;
         }
-        real[] hill_activation_and(real[] x1, real[] x2, real[] theta, int T) {
+        vector hill_activation_and(vector x1, vector x2, vector theta, int T) {
             real K1 = theta[1];
             real K2 = theta[2];
             real n1 = theta[3];
@@ -29,16 +29,16 @@ model = """
     }
     data {
         int<lower=1> T;
-        real x1[T];
-        real x2[T];
-        real y[T];
+        vector[T] x1;
+        vector[T] x2;
+        vector[T] y;
         //real ymin;
         //real ymax;
     }
     transformed data {
-        real x1_std[T];
-        real x2_std[T];
-        real y_std[T];
+        vector[T] x1_std;
+        vector[T] x2_std;
+        vector[T] y_std;
         real ymin_std;
         real ymax_std;
         x1_std = (x1 - mean(x1)) / sd(x1);
@@ -49,10 +49,10 @@ model = """
     }
     parameters {
         real<lower=0> sigma;
-        real<lower=0> theta[8];
+        vector<lower=0>[8] theta;
     }
     model {
-        real y_hat[T];
+        vector[T] y_hat;
         sigma ~ normal(0, 1);
         theta[1] ~ normal(1e2, 5e1);
         theta[2] ~ normal(1e2, 5e1);
