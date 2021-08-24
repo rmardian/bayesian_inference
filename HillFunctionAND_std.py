@@ -20,7 +20,7 @@ model = """
             real ymin2 = theta[6];
             real ymax1 = theta[7];
             real ymax2 = theta[8];
-            real hill[T];
+            vector[T] hill;
             for (t in 1:T) {
                 hill[t] = hill_activation(x1[t], K1, n1, ymin1, ymax1) + hill_activation(x2[t], K2, n2, ymin2, ymax2);
             }
