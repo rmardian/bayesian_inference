@@ -74,8 +74,6 @@ for gate in gates:
 
     fluo = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
-    #fluo_t['cuma'] = fluo_t['gate'].str[-2]
-    #fluo_t['ara'] = fluo_t['gate'].str[-1]
 
     for at_m in minutes:
         print('***************************{}-{}'.format(gate, at_m))
