@@ -76,6 +76,7 @@ for gate in gates:
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
 
     for at_m in minutes:
+        
         print('***************************{}-{}'.format(gate, at_m))
         y = fluo_t[at_m].values
         data = {
