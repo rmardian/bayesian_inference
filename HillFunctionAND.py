@@ -63,7 +63,7 @@ gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
 cuma_list = [0, 6.25, 12.5, 25, 50, 100]
 ara_list = [0, 0.8125, 3.25, 13, 52, 208]
-minutes = [960, 1440]
+minutes = [1440]
 
 t = len(cuma_list) * len(ara_list)
 x1, x2 = np.meshgrid(cuma_list, ara_list)
@@ -76,7 +76,7 @@ for gate in gates:
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
 
     for at_m in minutes:
-        
+
         print('***************************{}-{}'.format(gate, at_m))
         y = fluo_t[at_m].values
         data = {
