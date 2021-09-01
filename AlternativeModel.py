@@ -73,7 +73,7 @@ model = """
         real<lower=0.01> y0;
     }
     model {
-        real y_hat[T, 1];
+        real y_hat[T, 2];
         real y0_[2];
         theta[1] ~ normal(1, 0.2);
         theta[2] ~ normal(10, 5);
@@ -82,7 +82,7 @@ model = """
         y0_[1] = y0;
         y0_[2] = 0;
         y_hat = integrate_ode_rk45(alternative_dynamics, y0_, t0, ts, theta, x_r, x_i);
-        y[,1] ~ normal(y_hat[,2], sigma);
+        y[, 1] ~ normal(y_hat[, 2], sigma);
     }
 """
 
