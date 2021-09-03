@@ -6,12 +6,12 @@ from datetime import datetime
 
 model = """
     functions {
-        real hill_activation(real x, real K, real n, real ymin, real ymax) {
+        real hill_activation(real x, real K, real n, real ymin) {
             real hill;
-            hill = ymin + (ymax - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
+            hill = ymin + (1 - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
             return hill;
         }
-        real[] hill_activation_and(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, real ymax1, real ymax2, int T) {
+        real[] hill_activation_and(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, int T) {
             //real K1 = theta[1];
             //real K2 = theta[2];
             //real n1 = theta[3];
@@ -22,7 +22,7 @@ model = """
             //real ymax2 = theta[8];
             real hill[T];
             for (t in 1:T) {
-                hill[t] = hill_activation(x1[t], K1, n1, ymin1, ymax1) * hill_activation(x2[t], K2, n2, ymin2, ymax2);
+                hill[t] = hill_activation(x1[t], K1, n1, ymin1) * hill_activation(x2[t], K2, n2, ymin2);
             }
             return hill;
         }
@@ -38,8 +38,8 @@ model = """
     transformed data {
         real ymin;
         real ymax;
-        ymin = sqrt(min(y));
-        ymax = sqrt(max(y));
+        ymin = min(y)/max(y);
+        //ymax = sqrt(max(y));
     }
     parameters {
         real<lower=0> sigma;
@@ -50,8 +50,6 @@ model = """
         real<lower=0> n2;
         real<lower=0> ymin1;
         real<lower=0> ymin2;
-        real<lower=0> ymax1;
-        real<lower=0> ymax2;
     }
     model {
         real y_hat[T];
@@ -62,9 +60,7 @@ model = """
         n2 ~ normal(3, 1);
         ymin1 ~ normal(ymin, 0.5*ymin);
         ymin2 ~ normal(ymin, 0.5*ymin);
-        ymax1 ~ normal(ymax, 0.5*ymax);
-        ymax2 ~ normal(ymax, 0.5*ymax);
-        y_hat = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, ymax1, ymax2, T);
+        y_hat = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T);
         y ~ normal(y_hat, sigma);
     }
 """
@@ -74,7 +70,7 @@ gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
 cuma_list = [0, 6.25, 12.5, 25, 50, 100]
 ara_list = [0, 0.8125, 3.25, 13, 52, 208]
-minutes = [1440, 960]
+minutes = [900]
 
 t = len(cuma_list) * len(ara_list)
 x1, x2 = np.meshgrid(cuma_list, ara_list)
