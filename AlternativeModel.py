@@ -38,7 +38,7 @@ model = """
             real ymax;
             ymax = hill_activation_and(x_r[1], x_r[2], x_r[3], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10]);
             dydt[1] = theta[1] * y[1] * (1-y[1]/ymax);
-            dydt[2] = theta[2] * y[1] - x_r[11] * y[2];
+            dydt[2] = theta[2] * y[1] - theta[3] * y[2];
             return dydt;
         }
     }
@@ -50,10 +50,10 @@ model = """
         real t0;
         real ts[T];
         real params[8];
-        real degGFP;
+        //real degGFP;
     }
     transformed data {
-        real x_r[11];
+        real x_r[10];
         int x_i[0];
         x_r[1] = x1;
         x_r[2] = x2;
@@ -65,18 +65,19 @@ model = """
         x_r[8] = params[6];
         x_r[9] = params[7];
         x_r[10] = params[8];
-        x_r[11] = degGFP;
+        //x_r[11] = degGFP;
     }
     parameters {
         real<lower=0> sigma;
-        real<lower=0> theta[2];
-        real<lower=0.01> y0;
+        real<lower=0> theta[3];
+        real<lower=1e-5> y0;
     }
     model {
         real y_hat[T, 2];
         real y0_[2];
         theta[1] ~ normal(1, 0.2);
         theta[2] ~ normal(10, 5);
+        theta[3] ~ normal(0.5, 0.2);
         y0 ~ normal(1e3, 5e2);
         sigma ~ normal(0, 1);
         y0_[1] = y0;
@@ -95,7 +96,7 @@ ara_list = [0, 0.8125, 3.25, 13, 52, 208]
 beginning = datetime.now()
 
 for gate in gates:
-    for a in range(6):
+    for a in range(5, 6):
 
         print('******************{}_{}{}'.format(gate, a, a))
         fluo = fluos['{}_{}{}'.format(gate, a, a)]
@@ -110,7 +111,7 @@ for gate in gates:
             't0': -20,
             'ts': fluo.index.values,
             'params': hill_params[gate],
-            'degGFP': 0.01
+            #'degGFP': 0.01
         }
 
         # Compile the model
