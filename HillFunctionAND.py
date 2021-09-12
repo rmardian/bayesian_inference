@@ -12,14 +12,6 @@ model = """
             return hill;
         }
         real[] hill_activation_and(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, int T) {
-            //real K1 = theta[1];
-            //real K2 = theta[2];
-            //real n1 = theta[3];
-            //real n2 = theta[4];
-            //real ymin1 = theta[5];
-            //real ymin2 = theta[6];
-            //real ymax1 = theta[7];
-            //real ymax2 = theta[8];
             real hill[T];
             for (t in 1:T) {
                 hill[t] = hill_activation(x1[t], K1, n1, ymin1) * hill_activation(x2[t], K2, n2, ymin2);
@@ -32,18 +24,14 @@ model = """
         real x1[T];
         real x2[T];
         real y[T];
-        //real ymin;
-        //real ymax;
     }
     transformed data {
         real ymin;
         real ymax;
-        ymin = min(y)/max(y);
-        //ymax = sqrt(max(y));
+        ymin = min(y);
     }
     parameters {
         real<lower=0> sigma;
-        //real<lower=0> theta[8];
         real<lower=0> K1;
         real<lower=0> K2;
         real<lower=0> n1;
@@ -77,7 +65,7 @@ x1, x2 = np.meshgrid(cuma_list, ara_list)
 
 beginning = datetime.now()
 
-for gate in gates:
+for gate in gates[:2]:
 
     fluo = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
@@ -86,13 +74,12 @@ for gate in gates:
 
         print('***************************{}-{}'.format(gate, at_m))
         y = fluo_t[at_m].values
+        y[y < 0] = 0.01
         data = {
             'T': t,
             'x1': x1.ravel(),
             'x2': x2.ravel(),
-            'y': y,
-            #'ymin': np.sqrt(y.min()),
-            #'ymax': np.sqrt(y.max())
+            'y': y / y.max(),
         }
         # Compile the model
         posterior = stan.build(model, data=data)
