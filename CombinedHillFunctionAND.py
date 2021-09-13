@@ -19,11 +19,13 @@ model = """
             return hill;
         }
         real[] hill_activation_combined(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, int T, int dp) {
-            real combined[T*dp];
-            real temp[T];
+            real temp[dp, T];
+            real combined[dp*T];
             for (i in 1:dp) {
-                temp = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T);
-                combined = append_array(combined, temp);
+                temp[i] = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T);
+                for (j in 1:T) {
+                    combined[(i-1)*T+j] = temp[i][j];
+                }
             }
             return combined;
         }
@@ -33,7 +35,7 @@ model = """
         int<lower=1> dp;
         real x1[T];
         real x2[T];
-        real y[T];
+        real y[dp*T];
     }
     transformed data {
         real ymin;
@@ -50,7 +52,7 @@ model = """
         real<lower=0> ymin2;
     }
     model {
-        real y_hat[T];
+        real y_hat[dp*T];
         sigma ~ normal(0, 1);
         K1 ~ normal(1e2, 5e1);
         K2 ~ normal(1e2, 5e1);
@@ -68,14 +70,14 @@ gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
 cuma_list = [0, 6.25, 12.5, 25, 50, 100]
 ara_list = [0, 0.8125, 3.25, 13, 52, 208]
-minutes = [900]
+#minutes = [900]
 
 t = len(cuma_list) * len(ara_list)
 x1, x2 = np.meshgrid(cuma_list, ara_list)
 
 beginning = datetime.now()
 
-for gate in [gates[0]]:
+for gate in gates[1:]:
 
     fluo = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
@@ -90,20 +92,21 @@ for gate in [gates[0]]:
         y_[y_ < 0] = 0.01
         y_ = y_ / y_.max()
         y = y.append(y_)
-        data = {
-            'T': t,
-            'dp': dp,
-            'x1': x1.ravel(),
-            'x2': x2.ravel(),
-            'y': y.values
-        }
-        posterior = stan.build(model, data=data)
-        fit = posterior.sample(num_chains=10, num_warmup=5000, num_samples=5000)
-        df = fit.to_frame()
-        df.to_csv('hill-model-complete/Hill-{}-{}.csv'.format(gate, at_m))
+    print(len(y))
+    data = {
+        'T': t,
+        'dp': dp,
+        'x1': x1.ravel(),
+        'x2': x2.ravel(),
+        'y': y.values
+    }
+    posterior = stan.build(model, data=data)
+    fit = posterior.sample(num_chains=10, num_warmup=5000, num_samples=5000)
+    df = fit.to_frame()
+    df.to_csv('hill-model-complete/Hill-{}.csv'.format(gate))
 
-        data = az.from_pystan(posterior=fit)
-        data.to_netcdf('hill-model-complete/Hill-{}-{}.nc'.format(gate, at_m))
+    data = az.from_pystan(posterior=fit)
+    data.to_netcdf('hill-model-complete/Hill-{}.nc'.format(gate))
 
 ending = datetime.now()
 print('Started at:', beginning)
