@@ -79,6 +79,8 @@ beginning = datetime.now()
 
 for gate in gates[1:]:
 
+    print('******************', gate)
+
     fluo = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
 
