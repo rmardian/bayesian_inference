@@ -19,11 +19,11 @@ model = """
             return hill;
         }
         real[] hill_activation_combined(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, int T, int dp) {
-            real[] combined;
+            real combined[T*dp];
             real temp[T];
             for (i in 1:dp) {
-                temp = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2)
-                combined = append_array(combined, temp)
+                temp = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T);
+                combined = append_array(combined, temp);
             }
             return combined;
         }
@@ -58,7 +58,7 @@ model = """
         n2 ~ normal(3, 1);
         ymin1 ~ normal(ymin, 0.5*ymin);
         ymin2 ~ normal(ymin, 0.5*ymin);
-        y_hat = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T);
+        y_hat = hill_activation_combined(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T, dp);
         y ~ normal(y_hat, sigma);
     }
 """
@@ -84,18 +84,18 @@ for gate in [gates[0]]:
     start, end, gap = 0, 1460, 20
     dp = int((end-start)/gap)
 
-    for t in range(start, end, gap):
+    for at_m in range(start, end, gap):
 
-        y_ = fluo_t[t]
+        y_ = fluo_t[at_m]
         y_[y_ < 0] = 0.01
         y_ = y_ / y_.max()
         y = y.append(y_)
         data = {
-            'dp': dp,
             'T': t,
+            'dp': dp,
             'x1': x1.ravel(),
             'x2': x2.ravel(),
-            'y': y
+            'y': y.values
         }
         posterior = stan.build(model, data=data)
         fit = posterior.sample(num_chains=10, num_warmup=5000, num_samples=5000)
