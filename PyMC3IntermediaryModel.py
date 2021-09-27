@@ -384,7 +384,7 @@ class IntermediaryModel:
         ind1, ind2, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2, alpha, beta = p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11]
         syn_gate, deg_gate, syn_gfp, deg_gfp = p[12], p[13], p[14], p[15]
 
-        gamma = growth_rate(OD, alpha, beta)
+        gamma = IntermediaryModel.growth_rate(OD, alpha, beta)
         dOD = gamma * OD
         dmGate = syn_gate * IntermediaryModel.hill_activation_and((ind1, ind2), *hill_params[gate]) - (deg_gate + gamma) * mGate
         dGFP = syn_gfp * mGate - (deg_gfp + gamma) * GFP
