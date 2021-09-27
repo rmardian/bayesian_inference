@@ -463,7 +463,7 @@ data = {
 
 # compile the model
 posterior = stan.build(model, data=data)
-fit = posterior.sample(num_chains=6, num_warmup=5000, num_samples=5000)
+fit = posterior.sample(num_chains=1, num_warmup=5000, num_samples=5000)
 df = fit.to_frame()
 df.to_csv('intermediary-model/intermediary-{}.csv'.format(control))
 data = az.from_pystan(posterior=fit)
