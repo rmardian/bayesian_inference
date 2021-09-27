@@ -425,6 +425,8 @@ model = """
         real y0[2];
         theta[1] ~ normal(10, 2);
         theta[2] ~ normal(1, 0.5);
+        theta[3] ~ normal(10, 2);
+        theta[4] ~ normal(1, 0.5);
         sigma ~ normal(0, 1);
         y0[1] = 0;
         y0[1] = 0;
