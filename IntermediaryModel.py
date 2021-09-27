@@ -370,24 +370,10 @@ model = """
             hill = hill_activation(x1, K1, n1, ymin1, ymax1) * hill_activation(x2, K2, n2, ymin2, ymax2);
             return hill;
         }
-
         real growth_rate(real od, real r, real c) {
             real g;
             g = r * (1 - (od/c));
             return g;
-        }
-        real[] pos_ctrl(real t,
-                    real[] y,
-                    real[] theta,
-                    real[] x_r,
-                    int[] x_i
-                    ) {
-            real dydt[2];
-            real gamma;
-            gamma = growth_rate(y[2], x_r[1], x_r[1];
-            dydt[1] = theta[1] - (theta[2] + gamma) * y[1];
-            dydt[2] = gamma * y[2];
-            return dydt;
         }
         real[] intermediary_model(real t,
                     real[] y,
