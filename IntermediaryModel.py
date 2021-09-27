@@ -437,6 +437,10 @@ model = """
 """
 
 fluos = pd.read_csv('fluos.csv', index_col='time')
+gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32x30SspGyrB',
+         'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
+cumas = [0, 6.25, 12.5, 25, 50, 100]
+aras = [0, 0.8125, 3.25, 13, 52, 208]
 gate = 'e16x33NrdA2'
 data = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
 
@@ -450,6 +454,8 @@ for d in data.columns:
     data = {
         'T': len(fluo),
         'y': fluo.values.reshape(-1, 1),
+        'x1': cumas[5],
+        'x2': aras[5],
         't0': -20,
         'ts': fluo.index.values,
         'hill_params': hill_params[gate],
