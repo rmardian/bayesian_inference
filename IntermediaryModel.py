@@ -441,34 +441,33 @@ gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
 cumas = [0, 6.25, 12.5, 25, 50, 100]
 aras = [0, 0.8125, 3.25, 13, 52, 208]
+a, b = 5, 5
 gate = 'e16x33NrdA2'
-data = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
+
+fluo = fluos['{}_{}{}'.format(gate, a, b)]
 
 beginning = datetime.now()
 
-for d in data.columns:
+print('******************{}_{}{}'.format(gate, a, b))
 
-    print('******************{}'.format(d))
-    fluo = data[d]
+data = {
+    'T': len(fluo),
+    'y': fluo.values.reshape(-1, 1),
+    'x1': cumas[a],
+    'x2': aras[b],
+    't0': -20,
+    'ts': fluo.index.values,
+    'hill_params': hill_params[gate],
+    'od_params': od_params[d]
+}
 
-    data = {
-        'T': len(fluo),
-        'y': fluo.values.reshape(-1, 1),
-        'x1': cumas[5],
-        'x2': aras[5],
-        't0': -20,
-        'ts': fluo.index.values,
-        'hill_params': hill_params[gate],
-        'od_params': od_params[d]
-    }
-
-    # compile the model
-    posterior = stan.build(model, data=data)
-    fit = posterior.sample(num_chains=6, num_warmup=5000, num_samples=5000)
-    df = fit.to_frame()
-    df.to_csv('intermediary-model/intermediary-{}.csv'.format(control))
-    data = az.from_pystan(posterior=fit)
-    data.to_netcdf('intermediary-model/intermediary-{}.nc'.format(control))
+# compile the model
+posterior = stan.build(model, data=data)
+fit = posterior.sample(num_chains=6, num_warmup=5000, num_samples=5000)
+df = fit.to_frame()
+df.to_csv('intermediary-model/intermediary-{}.csv'.format(control))
+data = az.from_pystan(posterior=fit)
+data.to_netcdf('intermediary-model/intermediary-{}.nc'.format(control))
 
 ending = datetime.now()
 print('Started at:', beginning)
