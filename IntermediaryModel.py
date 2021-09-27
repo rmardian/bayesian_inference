@@ -464,7 +464,7 @@ for d in data.columns:
         'y': fluo.values.reshape(-1, 1),
         't0': -20,
         'ts': fluo.index.values,
-        'hill_params': hill_params[gate]
+        'hill_params': hill_params[gate],
         'od_params': od_params[d]
     }
 
@@ -472,9 +472,9 @@ for d in data.columns:
     posterior = stan.build(model, data=data)
     fit = posterior.sample(num_chains=6, num_warmup=5000, num_samples=5000)
     df = fit.to_frame()
-    df.to_csv('alternative-model-complete/intermediary-{}.csv'.format(control))
+    df.to_csv('intermediary-model/intermediary-{}.csv'.format(control))
     data = az.from_pystan(posterior=fit)
-    data.to_netcdf('alternative-model-complete/intermediary-{}.nc'.format(control))
+    data.to_netcdf('intermediary-model/intermediary-{}.nc'.format(control))
 
 ending = datetime.now()
 print('Started at:', beginning)
