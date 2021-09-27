@@ -68,8 +68,8 @@ model = """
         sigma ~ normal(0, 1);
         y0[1] = 0;
         y0[2] = params[3];
-        y_hat = integrate_ode_rk45(pos_ctrl, y0_, t0, ts, theta, x_r, x_i);
-        y[, 1] ~ normal(y_hat[, 2], sigma);
+        y_hat = integrate_ode_rk45(pos_ctrl, y0, t0, ts, theta, x_r, x_i);
+        y[, 1] ~ normal(y_hat[, 1], sigma);
     }
 """
 
