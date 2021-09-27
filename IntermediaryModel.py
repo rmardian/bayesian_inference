@@ -458,7 +458,7 @@ data = {
     't0': -20,
     'ts': fluo.index.values,
     'hill_params': hill_params[gate],
-    'od_params': od_params[d]
+    'od_params': od_params['{}_{}{}'.format(gate, a, b)]
 }
 
 # compile the model
