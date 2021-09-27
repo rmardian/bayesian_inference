@@ -383,7 +383,7 @@ model = """
                     ) {
             real dydt[3];
             real gamma;
-            gamma = growth_rate(y[3], x_r[11], x_r[12];
+            gamma = growth_rate(y[3], x_r[11], x_r[12]);
             dydt[1] = theta[1] * hill_activation_and(x_r[1], x_r[2], x_r[3], x_r[4], x_r[5], x_r[6], x_r[7], x_r[8], x_r[9], x_r[10]) - (theta[2] + gamma) * y[1];
             dydt[2] = theta[3] * - (theta[4] + gamma) * y[2];
             dydt[3] = gamma * y[3];
