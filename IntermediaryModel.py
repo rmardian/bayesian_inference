@@ -421,15 +421,15 @@ model = """
         real<lower=0> theta[2];
     }
     model {
-        real y_hat[T, 2];
-        real y0[2];
+        real y_hat[T, 3];
+        real y0[3];
         theta[1] ~ normal(10, 2);
         theta[2] ~ normal(1, 0.5);
         theta[3] ~ normal(10, 2);
         theta[4] ~ normal(1, 0.5);
         sigma ~ normal(0, 1);
         y0[1] = 0;
-        y0[1] = 0;
+        y0[2] = 0;
         y0[3] = od_params[3];
         y_hat = integrate_ode_rk45(intermediary_model, y0, t0, ts, theta, x_r, x_i);
         y[, 2] ~ normal(y_hat[, 2], sigma);
