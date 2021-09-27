@@ -392,7 +392,7 @@ model = """
     }
     data {
         int<lower=1> T;
-        real y[T, 3];
+        real y[T, 1];
         real t0;
         real ts[T];
         real x1;
@@ -432,7 +432,7 @@ model = """
         y0[2] = 0;
         y0[3] = od_params[3];
         y_hat = integrate_ode_rk45(intermediary_model, y0, t0, ts, theta, x_r, x_i);
-        y[, 2] ~ normal(y_hat[, 2], sigma);
+        y[, 1] ~ normal(y_hat[, 2], sigma);
     }
 """
 
