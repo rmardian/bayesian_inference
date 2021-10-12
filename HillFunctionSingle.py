@@ -9,7 +9,7 @@ model = """
         real[] hill_activation(real[] x, real K, real n, real ymin, real ymax, int T) {
             real hill[T];
             for (t in 1:T) {
-                hill[t] = ymin + (ymax - ymin) * (pow(x[t], n) / (pow(K, n) + pow(x, n)));
+                hill[t] = ymin + (ymax - ymin) * (pow(x[t], n) / (pow(K, n) + pow(x[t], n)));
             }
             return hill;
         }
