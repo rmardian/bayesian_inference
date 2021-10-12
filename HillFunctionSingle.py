@@ -6,9 +6,11 @@ from datetime import datetime
 
 model = """
     functions {
-        real hill_activation(real x, real K, real n, real ymin, real ymax) {
-            real hill;
-            hill = ymin + (ymax - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
+        real[] hill_activation(real[] x, real K, real n, real ymin, real ymax, int T) {
+            real hill[T];
+            for (t in 1:T) {
+                hill[t] = ymin + (ymax - ymin) * (pow(x[t], n) / (pow(K, n) + pow(x, n)));
+            }
             return hill;
         }
     }
@@ -37,7 +39,7 @@ model = """
         n ~ normal(3, 1);
         ymin ~ normal(ymin0, 0.5*ymin0);
         ymax ~ normal(ymax0, 0.5*ymax0);
-        y_hat = hill_activation(x, K, n, ymin, ymax);
+        y_hat = hill_activation(x, K, n, ymin, ymax, T);
         y ~ normal(y_hat, sigma);
     }
 """
