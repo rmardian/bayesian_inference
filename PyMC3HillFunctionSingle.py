@@ -24,8 +24,8 @@ for col in columns:
 
     print('***************************{}'.format(col))
     
-    fluo = fluos[col]
-    inducer = inducers[col]
+    fluo = fluos[col].values
+    inducer = inducers[col].values
     ymin0 = fluo.min()
     ymax0 = fluo.max()
 
