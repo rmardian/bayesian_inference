@@ -57,8 +57,8 @@ for col in columns:
     
     data = {
         'T': len(fluo),
-        'x': inducer,
-        'y': fluo,
+        'x': inducer.values,
+        'y': fluo.values,
     }
     # Compile the model
     posterior = stan.build(model, data=data)
