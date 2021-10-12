@@ -41,7 +41,7 @@ for col in columns:
         y_pred = pm.Normal('y_hat', mu=y_hat, sigma=1, observed=fluo)
         
         step = pm.Metropolis()
-        trace = pm.sample(5000, tune=5000, cores=-1, chains=10, step=step)
+        trace = pm.sample(10000, tune=10000, cores=-1, chains=10, step=step)
 
         data = az.from_pymc3(trace=trace)
         data.to_netcdf('response-functions/resp-{}.nc'.format(col))
