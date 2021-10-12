@@ -37,7 +37,7 @@ model = """
         n ~ normal(3, 1);
         ymin ~ normal(ymin0, 0.5*ymin0);
         ymax ~ normal(ymax0, 0.5*ymax0);
-        y_hat = hill_activation(x, K, n, ymin, ymax, T);
+        y_hat = hill_activation(x, K, n, ymin, ymax);
         y ~ normal(y_hat, sigma);
     }
 """
