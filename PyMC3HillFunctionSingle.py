@@ -31,14 +31,14 @@ for col in columns[1:]:
 
     with pm.Model() as bayesian_model:
         
-        sigma = pm.Normal('sigma', mu=0, sigma=1)
+        #sigma = pm.Normal('sigma', mu=0, sigma=1)
         k = pm.Normal('K', mu=1e1, sigma=5)
         n = pm.Normal('n', mu=5, sigma=1)
         ymin = pm.Normal('ymin', mu=ymin0, sigma=0.1*ymin0)
         ymax = pm.Normal('ymax', mu=ymax0, sigma=0.1*ymax0)
         
         y_hat = HillFunction.hill_activation(inducer, k, n, ymin, ymax)
-        y_pred = pm.Normal('y_hat', mu=y_hat, sigma=sigma, observed=fluo)
+        y_pred = pm.Normal('y_hat', mu=y_hat, sigma=1, observed=fluo)
         
         step = pm.Metropolis()
         trace = pm.sample(5000, tune=5000, cores=-1, chains=10, step=step)
