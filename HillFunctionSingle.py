@@ -18,10 +18,10 @@ model = """
         real y[T];
     }
     transformed data {
-        real ymin;
-        real ymax;
-        ymin = min(y);
-        ymin = max(y);
+        real ymin0;
+        real ymax0;
+        ymin0 = min(y);
+        ymax0 = max(y);
     }
     parameters {
         real<lower=0> sigma;
@@ -35,8 +35,8 @@ model = """
         sigma ~ normal(0, 1);
         K ~ normal(1e2, 5e1);
         n ~ normal(3, 1);
-        ymin ~ normal(ymin, 0.5*ymin);
-        ymax ~ normal(ymax, 0.5*ymax);
+        ymin ~ normal(ymin0, 0.5*ymin0);
+        ymax ~ normal(ymax0, 0.5*ymax0);
         y_hat = hill_activation(x, K, n, ymin, ymax, T);
         y ~ normal(y_hat, sigma);
     }
