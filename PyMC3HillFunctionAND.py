@@ -28,7 +28,7 @@ class HillFunction:
             result = np.append(result, temp)   
         return result
 
-fluos = pd.read_csv('fluos_rpu_600.csv', index_col='gate')
+fluos = pd.read_csv('fluos_rpu_600.csv')
 gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32x30SspGyrB',
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
 cumas_rpu = [0.0024930475754170005, 0.012183419457922659, 0.12362677605742128, 0.8546102179257526, 1.5521602964092271, 1.652939765595156],
