@@ -32,10 +32,10 @@ for col in columns[1:]:
     with pm.Model() as bayesian_model:
         
         sigma = pm.Normal('sigma', mu=0, sigma=1)
-        k = pm.Normal('K1', mu=1e2, sigma=5e1)
-        n = pm.Normal('n1', mu=3, sigma=1)
-        ymin = pm.Normal('ymin', mu=ymin0, sigma=0.5*ymin0)
-        ymax = pm.Normal('ymax', mu=ymax0, sigma=0.5*ymax0)
+        k = pm.Normal('K', mu=1e1, sigma=5)
+        n = pm.Normal('n', mu=5, sigma=1)
+        ymin = pm.Normal('ymin', mu=ymin0, sigma=0.1*ymin0)
+        ymax = pm.Normal('ymax', mu=ymax0, sigma=0.1*ymax0)
         
         y_hat = HillFunction.hill_activation(inducer, k, n, ymin, ymax)
         y_pred = pm.Normal('y_hat', mu=y_hat, sigma=sigma, observed=fluo)
