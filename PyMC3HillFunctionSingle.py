@@ -20,7 +20,7 @@ columns = fluos.columns.tolist()
 beginning = datetime.now()
 print('Started at:', beginning)
 
-for col in columns:
+for col in columns[1:]:
 
     print('***************************{}'.format(col))
     
