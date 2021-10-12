@@ -19,15 +19,6 @@ class HillFunction:
         x1, x2 = x
         return HillFunction.hill_activation(x1, K1, n1, ymin1, ymax1) * HillFunction.hill_activation(x2, K2, n2, ymin2, ymax2)
 
-    @staticmethod
-    def hill_activation_combined(x, K1, K2, n1, n2, ymin1, ymin2):
-        
-        result = []
-        for i in range(0, 1460, 20):
-            temp = HillFunction.hill_activation_and(x, K1, K2, n1, n2, ymin1, ymin2)
-            result = np.append(result, temp)   
-        return result
-
 fluos = pd.read_csv('fluos_rpu_600.csv')
 gates = ['e11x32STPhoRadA', 'e15x32NpuSspS2', 'e16x33NrdA2', 'e20x32gp411', 'e32x30SspGyrB',
          'e34x30MjaKlbA', 'e38x32gp418', 'e41x32NrdJ1', 'e42x32STIMPDH1']
@@ -55,12 +46,12 @@ for gate in gates:
         k2 = pm.Normal('K2', mu=1e2, sigma=5e1)
         n1 = pm.Normal('n1', mu=3, sigma=1)
         n2 = pm.Normal('n2', mu=3, sigma=1)
-        ymin1 = pm.Normal('ymin1', mu=y.min(), sigma=0.01*y.min())
-        ymin2 = pm.Normal('ymin2', mu=y.min(), sigma=0.01*y.min())
-        ymax1 = pm.Normal('ymax1', mu=y.max(), sigma=0.01*y.max())
-        ymax2 = pm.Normal('ymax2', mu=y.max(), sigma=0.01*y.max())
+        ymin1 = pm.Normal('ymin1', mu=y.min(), sigma=0.1)
+        ymin2 = pm.Normal('ymin2', mu=y.min(), sigma=0.1)
+        ymax1 = pm.Normal('ymax1', mu=y.max(), sigma=0.1)
+        ymax2 = pm.Normal('ymax2', mu=y.max(), sigma=0.1)
         
-        y_hat = HillFunction.hill_activation_combined(x, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2)
+        y_hat = HillFunction.hill_activation_and(x, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2)
         y_pred = pm.Normal('y_hat', mu=y_hat, sigma=1, observed=y)
         
         step = pm.Metropolis()
