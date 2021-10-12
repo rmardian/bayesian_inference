@@ -6,15 +6,15 @@ from datetime import datetime
 
 model = """
     functions {
-        real hill_activation(real x, real K, real n, real ymin) {
+        real hill_activation(real x, real K, real n, real ymin, real ymax) {
             real hill;
-            hill = ymin + (1 - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
+            hill = ymin + (ymax - ymin) * (pow(x, n) / (pow(K, n) + pow(x, n)));
             return hill;
         }
-        real[] hill_activation_and(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, int T) {
+        real[] hill_activation_and(real[] x1, real[] x2, real K1, real K2, real n1, real n2, real ymin1, real ymin2, real ymax1, real ymax2, int T) {
             real hill[T];
             for (t in 1:T) {
-                hill[t] = hill_activation(x1[t], K1, n1, ymin1) * hill_activation(x2[t], K2, n2, ymin2);
+                hill[t] = hill_activation(x1[t], K1, n1, ymin1, ymax1) * hill_activation(x2[t], K2, n2, ymin2, ymax2);
             }
             return hill;
         }
@@ -29,6 +29,7 @@ model = """
         real ymin;
         real ymax;
         ymin = min(y);
+        ymax = max(y);
     }
     parameters {
         real<lower=0> sigma;
@@ -38,6 +39,8 @@ model = """
         real<lower=0> n2;
         real<lower=0> ymin1;
         real<lower=0> ymin2;
+        real<lower=0> ymax1;
+        real<lower=0> ymax2;
     }
     model {
         real y_hat[T];
@@ -48,7 +51,9 @@ model = """
         n2 ~ normal(3, 1);
         ymin1 ~ normal(ymin, 0.5*ymin);
         ymin2 ~ normal(ymin, 0.5*ymin);
-        y_hat = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, T);
+        ymax1 ~ normal(ymax, 0.5*ymax);
+        ymax2 ~ normal(ymax, 0.5*ymax);
+        y_hat = hill_activation_and(x1, x2, K1, K2, n1, n2, ymin1, ymin2, ymax1, ymax2, T);
         y ~ normal(y_hat, sigma);
     }
 """
@@ -65,7 +70,7 @@ x1, x2 = np.meshgrid(cuma_list, ara_list)
 
 beginning = datetime.now()
 
-for gate in gates[:2]:
+for gate in gates:
 
     fluo = fluos[filter(lambda x: x.startswith(gate), fluos.columns)]
     fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
@@ -79,7 +84,7 @@ for gate in gates[:2]:
             'T': t,
             'x1': x1.ravel(),
             'x2': x2.ravel(),
-            'y': y / y.max(),
+            'y': y,
         }
         # Compile the model
         posterior = stan.build(model, data=data)
