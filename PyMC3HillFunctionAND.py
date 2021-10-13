@@ -58,7 +58,7 @@ for gate in gates:
         trace = pm.sample(5000, tune=5000, cores=-1, chains=10, step=step)
 
         data = az.from_pymc3(trace=trace)
-        data.to_netcdf('response-functions/hill-{}.nc'.format(gate))
+        data.to_netcdf('response-functions/hill2-{}.nc'.format(gate))
     
 ending = datetime.now()
 print('Finished at:', ending)
