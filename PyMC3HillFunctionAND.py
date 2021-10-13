@@ -36,8 +36,13 @@ for gate in gates:
     print('******************{}'.format(gate))
 
     fluo = fluos[fluos['gate'].str.startswith(gate)]
+
+    print(fluo)
+
     #fluo_t = fluo.transpose().reset_index().rename(columns={'index': 'gate'})
     y = fluo.values
+
+    print(y)
 
     with pm.Model() as bayesian_model:
         
