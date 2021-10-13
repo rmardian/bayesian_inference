@@ -50,7 +50,7 @@ for gate in gates:
         ymax1 = pm.Normal('ymax1', mu=y.max(), sigma=1)
         ymax2 = pm.Normal('ymax2', mu=y.max(), sigma=1)
         
-        y_hat = HillFunction.hill_activation(x, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2)
+        y_hat = HillFunction.hill_activation_and(x, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2)
         y_pred = pm.Normal('y_hat', mu=y_hat, sigma=1, observed=y)
         
         step = pm.Metropolis()
