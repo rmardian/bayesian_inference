@@ -38,8 +38,6 @@ for gate in gates:
     fluo = fluos[fluos['gate'].str.startswith(gate)]
     y = fluo['fluo'].values
 
-    print(y)
-
     with pm.Model() as bayesian_model:
         
         #sigma = pm.Normal('sigma', mu=0, sigma=1)
@@ -47,12 +45,12 @@ for gate in gates:
         k2 = pm.Normal('K2', mu=1e2, sigma=5e1)
         n1 = pm.Normal('n1', mu=3, sigma=1)
         n2 = pm.Normal('n2', mu=3, sigma=1)
-        ymin1 = pm.Normal('ymin1', mu=1, sigma=0.1)
-        ymin2 = pm.Normal('ymin2', mu=1, sigma=0.1)
-        ymax1 = pm.Normal('ymax1', mu=10, sigma=0.1)
-        ymax2 = pm.Normal('ymax2', mu=10, sigma=0.1)
+        ymin1 = pm.Normal('ymin1', mu=y.min(), sigma=1)
+        ymin2 = pm.Normal('ymin2', mu=y.min(), sigma=1)
+        ymax1 = pm.Normal('ymax1', mu=y.max(), sigma=1)
+        ymax2 = pm.Normal('ymax2', mu=y.max(), sigma=1)
         
-        y_hat = HillFunction.hill_activation_and(x, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2)
+        y_hat = HillFunction.hill_activation(x, k1, k2, n1, n2, ymin1, ymin2, ymax1, ymax2)
         y_pred = pm.Normal('y_hat', mu=y_hat, sigma=1, observed=y)
         
         step = pm.Metropolis()
