@@ -54,7 +54,7 @@ for gate in gates:
         y_pred = pm.Normal('y_hat', mu=y_hat, sigma=1, observed=y)
         
         step = pm.Metropolis()
-        trace = pm.sample(5000, tune=5000, cores=-1, chains=10, step=step)
+        trace = pm.sample(10000, tune=10000, cores=-1, chains=10, step=step)
 
         data = az.from_pymc3(trace=trace)
         data.to_netcdf('response-functions/hill-{}.nc'.format(gate))
