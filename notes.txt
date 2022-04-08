@@ -1,0 +1,17 @@
+Bayesian model in GCE
+---------------------
+pip install arviz==0.11.0
+pip install pymc3==3.10.0
+
+sudo apt-get install g++
+
+pip install mkl
+
+sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
+
+theano-cache purge
+
+conda config --set auto_activate_base false
+
+
+https://medium.com/google-cloud/set-up-anaconda-under-google-cloud-vm-on-windows-f71fc1064bd7
